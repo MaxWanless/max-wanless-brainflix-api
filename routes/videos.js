@@ -28,13 +28,23 @@ router.get("/:id", (req, res) => {
   }
 });
 
+//Return comments for current video
+router.get("/:id/comments", (req, res) => {
+  let videosData = JSON.parse(fs.readFileSync("./data/video-details.json"));
+  const currentVideo = videosData.find((video) => video.id == req.params.id);
+  if (currentVideo) {
+    res.json(currentVideo.comments);
+  } else {
+    res.status(400).json("Video not found");
+  }
+});
+
+
 // Video Post endpoint
 router.post("/newVideo", (req, res) => {
-  console.log("hit");
   let videosDetailList = JSON.parse(
     fs.readFileSync("./data/video-details.json")
   );
-  console.log(req.body.description)
   let newVideo = {
     title: req.body.title,
     channel: "Bing Bong",
