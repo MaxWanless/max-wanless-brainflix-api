@@ -7,6 +7,10 @@ const { v4: uuidv4 } = require("uuid");
 router.get("/", (req, res) => {
   let videosData = JSON.parse(fs.readFileSync("./data/video-details.json"));
   const videoList = videosData.map((video) => {
+    // video.comments.forEach((comment)=>{
+    //   console.log(`"id"`+ ":" + `"${uuidv4()}",`)
+    // })
+
     return {
       id: video.id,
       title: video.title,
@@ -28,17 +32,40 @@ router.get("/:id", (req, res) => {
   }
 });
 
-//Return comments for current video
-router.get("/:id/comments", (req, res) => {
-  let videosData = JSON.parse(fs.readFileSync("./data/video-details.json"));
-  const currentVideo = videosData.find((video) => video.id == req.params.id);
-  if (currentVideo) {
-    res.json(currentVideo.comments);
-  } else {
-    res.status(400).json("Video not found");
-  }
-});
+//Comment get and post endpoint
+router
+  .route("/:id/comments")
+  .get(function (req, res) {
+    let videosData = JSON.parse(fs.readFileSync("./data/video-details.json"));
+    const currentVideo = videosData.find((video) => video.id == req.params.id);
+    if (currentVideo) {
+      res.json(currentVideo.comments);
+    } else {
+      res.status(400).json("Video not found");
+    }
+  })
+  .post(function (req, res) {
+    let videosData = JSON.parse(fs.readFileSync("./data/video-details.json"));
+    const currentVideo = videosData.find((video) => video.id == req.params.id);
+    let newComment = {
+      name: req.body.name,
+      comment: req.body.comment,
+      likes: 0,
+      timestamp: Date.now(),
+      id: uuidv4(),
+    };
+    currentVideo.comments.push(newComment);
+    videosData.map((video) => {
+      if (video.id === currentVideo.id) {
+        return (video = currentVideo);
+      }
+    });
+    fs.writeFileSync("./data/video-details.json", JSON.stringify(videosData));
+    res.status(200).json(newComment);
+  });
 
+
+  
 
 // Video Post endpoint
 router.post("/newVideo", (req, res) => {
