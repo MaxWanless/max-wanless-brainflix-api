@@ -11,6 +11,10 @@ app.use(cors());
 // required to accces the body
 app.use(express.json());
 
+// Middleware to serve up static files
+app.use("/endpoint-files", express.static("./public/images"));
+
+//Call videos route
 app.use("/videos", videosRoute);
 
 app.listen(8080, () => {
