@@ -1,3 +1,4 @@
+const { Console } = require("console");
 const express = require("express");
 const router = express.Router();
 const fs = require("fs");
@@ -64,25 +65,42 @@ router
     res.status(200).json(newComment);
   });
 
-router.delete("/:id/comments/:commentId", (req, res) => {
-  let videosData = JSON.parse(fs.readFileSync("./data/video-details.json"));
-  const currentVideo = videosData.find((video) => video.id == req.params.id);
-  const currentComment = currentVideo.comments.find(
-    (comment) => comment.id == req.params.commentId
-  );
+router
+  .route("/:id/comments/:commentId")
+  .delete(function (req, res) {
+    let videosData = JSON.parse(fs.readFileSync("./data/video-details.json"));
+    const currentVideo = videosData.find((video) => video.id == req.params.id);
+    const currentComment = currentVideo.comments.find(
+      (comment) => comment.id == req.params.commentId
+    );
 
-  currentVideo.comments.splice(
-    currentVideo.comments.indexOf(currentComment),
-    1
-  );
-  videosData.map((video) => {
-    if (video.id === currentVideo.id) {
-      return (video = currentVideo);
-    }
+    currentVideo.comments.splice(
+      currentVideo.comments.indexOf(currentComment),
+      1
+    );
+    videosData.map((video) => {
+      if (video.id === currentVideo.id) {
+        return (video = currentVideo);
+      }
+    });
+    fs.writeFileSync("./data/video-details.json", JSON.stringify(videosData));
+    res.status(200).json(currentComment);
+  })
+  .put(function (req, res) {
+    let videosData = JSON.parse(fs.readFileSync("./data/video-details.json"));
+    const currentVideo = videosData.find((video) => video.id == req.params.id);
+    const currentComment = currentVideo.comments.find(
+      (comment) => comment.id == req.params.commentId
+    );
+    currentComment.likes = currentComment.likes + 1;
+    videosData.map((video) => {
+      if (video.id === currentVideo.id) {
+        return (video = currentVideo);
+      }
+    });
+    fs.writeFileSync("./data/video-details.json", JSON.stringify(videosData));
+    res.status(200).json(currentComment);
   });
-  fs.writeFileSync("./data/video-details.json", JSON.stringify(videosData));
-  res.status(200).json(currentComment);
-});
 
 // Video Post endpoint
 router.post("/newVideo", (req, res) => {
