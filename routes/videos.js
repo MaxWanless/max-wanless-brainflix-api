@@ -3,24 +3,73 @@ const express = require("express");
 const router = express.Router();
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
+const multer = require("multer");
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./public/images");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+const filter = (req, file, cb) => {
+  if (file.mimetype === "image/jpeg" || "image/png") {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 1024 * 1024 * 30 },
+  fileFilter: filter,
+});
 
 // Return Video List endpoint
-router.get("/", (req, res) => {
-  let videosData = JSON.parse(fs.readFileSync("./data/video-details.json"));
-  const videoList = videosData.map((video) => {
-    // video.comments.forEach((comment)=>{
-    //   console.log(`"id"`+ ":" + `"${uuidv4()}",`)
-    // })
-
-    return {
-      id: video.id,
-      title: video.title,
-      image: video.image,
-      channel: video.channel,
+router
+  .route("/")
+  .get(function (req, res) {
+    let videosData = JSON.parse(fs.readFileSync("./data/video-details.json"));
+    const videoList = videosData.map((video) => {
+      return {
+        id: video.id,
+        title: video.title,
+        image: video.image,
+        channel: video.channel,
+      };
+    });
+    res.json(videoList);
+  })
+  .post(upload.single("thumbnailImage"), function (req, res) {
+    console.log(req.file.originalname);
+    let videosDetailList = JSON.parse(
+      fs.readFileSync("./data/video-details.json")
+    );
+    let newVideo = {
+      title: req.body.title,
+      channel: "Bing Bong",
+      image: `http://localhost:8080/endpoint-files/${req.file.originalname}`,
+      description: req.body.description,
+      views: Math.floor(Math.random() * 1000000)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+      likes: Math.floor(Math.random() * 1000)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+      duration: "3:02",
+      video: "https://project-2-api.herokuapp.com/stream",
+      timestamp: Date.now(),
+      comments: [],
+      id: uuidv4(),
     };
+    videosDetailList.push(newVideo);
+    fs.writeFileSync(
+      "./data/video-details.json",
+      JSON.stringify(videosDetailList)
+    );
+    res.json(newVideo);
   });
-  res.json(videoList);
-});
 
 //Return current video details endpoint
 router.get("/:id", (req, res) => {
@@ -101,35 +150,5 @@ router
     fs.writeFileSync("./data/video-details.json", JSON.stringify(videosData));
     res.status(200).json(currentComment);
   });
-
-// Video Post endpoint
-router.post("/newVideo", (req, res) => {
-  let videosDetailList = JSON.parse(
-    fs.readFileSync("./data/video-details.json")
-  );
-  let newVideo = {
-    title: req.body.title,
-    channel: "Bing Bong",
-    image: "http://localhost:8080/endpoint-files/Upload-video-preview.jpg",
-    description: req.body.description,
-    views: Math.floor(Math.random() * 1000000)
-      .toString()
-      .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-    likes: Math.floor(Math.random() * 1000)
-      .toString()
-      .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-    duration: "3:02",
-    video: "https://project-2-api.herokuapp.com/stream",
-    timestamp: Date.now(),
-    comments: [],
-    id: uuidv4(),
-  };
-  videosDetailList.push(newVideo);
-  fs.writeFileSync(
-    "./data/video-details.json",
-    JSON.stringify(videosDetailList)
-  );
-  res.json(newVideo);
-});
 
 module.exports = router;
