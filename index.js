@@ -13,6 +13,7 @@ app.use(express.json());
 
 // Middleware to serve up static files
 app.use("/endpoint-files", express.static("./public/images"));
+app.use("/endpoint-files", express.static("./public/videos"));
 
 //Call videos route
 app.use("/videos", videosRoute);

@@ -7,7 +7,7 @@
     "views": "1,001,023",
     "likes": "110,985",
     "duration": "4:01",
-    "video": "https://project-2-api.herokuapp.com/stream",
+    "video": "http://localhost:8080/endpoint-files/BrainStation-Sample-Video.mp4",
     "timestamp": 1626032763000,
     "comments": [
       {
