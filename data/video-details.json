@@ -42,7 +42,7 @@
     "views": "2,043,765",
     "likes": "400,058",
     "duration": "7:26",
-    "video": "https://project-2-api.herokuapp.com/stream",
+    "video": "https://project-2-api.herokuapp.com/stream?api_key=932a11b5-a3bc-4b6e-a9d8-6d6f90eec750",
     "timestamp": 1625158995000,
     "comments": [
       {
@@ -77,7 +77,7 @@
     "views": "16,950",
     "likes": "3,856",
     "duration": "4:13",
-    "video": "https://project-2-api.herokuapp.com/stream",
+    "video": "https://project-2-api.herokuapp.com/stream?api_key=932a11b5-a3bc-4b6e-a9d8-6d6f90eec750",
     "timestamp": 1622991672000,
     "comments": [
       {
