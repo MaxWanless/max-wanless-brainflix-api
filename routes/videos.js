@@ -41,15 +41,20 @@ router
     });
     res.json(videoList);
   })
-  .post(upload.single("thumbnailImage"), function (req, res) {
-    console.log(req.file.originalname);
+  .post(upload.single("image"), function (req, res) {
+    let filename = ""
+    if(req.file){
+      filename = req.file.originalname
+    }else{
+      filename = "Upload-video-preview.jpg"
+    }
     let videosDetailList = JSON.parse(
       fs.readFileSync("./data/video-details.json")
     );
     let newVideo = {
       title: req.body.title,
       channel: "Bing Bong",
-      image: `http://localhost:8080/endpoint-files/${req.file.originalname}`,
+      image: `http://localhost:8080/endpoint-files/${filename}`,
       description: req.body.description,
       views: Math.floor(Math.random() * 1000000)
         .toString()
