@@ -19,5 +19,6 @@ app.use("/endpoint-files", express.static("./public/videos"));
 app.use("/videos", videosRoute);
 
 app.listen(8080, () => {
-  console.log("Running");
+  console.log("Running on: " + PORT);
+  console.log("URL: " + BACKEND_URL);
 });

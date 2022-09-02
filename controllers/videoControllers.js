@@ -1,8 +1,15 @@
 const videoModel = require("../models/videoModel");
 const { v4: uuidv4 } = require("uuid");
 
+const readfile = () => {
+  return videoModel.fetchVideoList();
+};
+const getCurrentVideo = (id) => {
+  return readfile().find((video) => video.id == id);
+};
+
 const videoList = (req, res) => {
-  let videos = videoModel.fetchVideoList();
+  let videos = readfile();
   const videoList = videos.map((video) => {
     return {
       id: video.id,
@@ -15,8 +22,7 @@ const videoList = (req, res) => {
 };
 
 const videoDetail = (req, res) => {
-  let videos = videoModel.fetchVideoList();
-  const currentVideo = videos.find((video) => video.id == req.params.id);
+  const currentVideo = getCurrentVideo(req.params.id);
   if (currentVideo) {
     res.json(currentVideo);
   } else {
@@ -24,9 +30,25 @@ const videoDetail = (req, res) => {
   }
 };
 
-const videoComments = (req, res) => {
+const likeVideo = (req, res) => {
   let videos = videoModel.fetchVideoList();
-  const currentVideo = videos.find((video) => video.id == req.params.id);
+  let currentVideo = videos.find((video) => video.id == req.params.id);
+  currentVideo.likes = (
+    parseInt(currentVideo.likes.replace(/(\d+),(?=\d{3}(\D|$))/g, "$1")) + 1
+  )
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  videos.map((video) => {
+    if (video.id === currentVideo.id) {
+      return (video = currentVideo);
+    }
+  });
+  videoModel.writeVideoData(videos);
+  res.send(currentVideo);
+};
+
+const videoComments = (req, res) => {
+  const currentVideo = getCurrentVideo(req.params.id);
   if (currentVideo) {
     res.json(currentVideo.comments);
   } else {
@@ -35,7 +57,7 @@ const videoComments = (req, res) => {
 };
 
 const postComment = (req, res) => {
-  let videos = videoModel.fetchVideoList();
+  let videos = readfile();
   const currentVideo = videos.find((video) => video.id == req.params.id);
   let newComment = {
     name: req.body.name,
@@ -109,7 +131,7 @@ const postVideo = (req, res) => {
       .toString()
       .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
     duration: "3:02",
-    video: "https://project-2-api.herokuapp.com/stream",
+    video: "http://localhost:8080/endpoint-files/BrainStation-Sample-Video.mp4",
     timestamp: Date.now(),
     comments: [],
     id: uuidv4(),
@@ -122,6 +144,7 @@ const postVideo = (req, res) => {
 module.exports = {
   videoList,
   videoDetail,
+  likeVideo,
   videoComments,
   postComment,
   deleteComment,
