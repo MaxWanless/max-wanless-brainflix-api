@@ -5,17 +5,17 @@ const videosRoute = require("./routes/videos");
 const { PORT, BACKEND_URL } = process.env;
 const cors = require("cors");
 
-//Cors middleware
+//Cors Middleware
 app.use(cors());
 
-// required to accces the body
+// Middleware to accces the body
 app.use(express.json());
 
 // Middleware to serve up static files
 app.use("/endpoint-files", express.static("./public/images"));
 app.use("/endpoint-files", express.static("./public/videos"));
 
-//Call videos route
+//Videos route
 app.use("/videos", videosRoute);
 
 app.listen(8080, () => {

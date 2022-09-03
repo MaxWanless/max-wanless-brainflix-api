@@ -1,13 +1,15 @@
 const videoModel = require("../models/videoModel");
 const { v4: uuidv4 } = require("uuid");
 
+//Call data read Model
 const readfile = () => {
   return videoModel.fetchVideoList();
 };
+//Returns signle video based on ID
 const getCurrentVideo = (id) => {
   return readfile().find((video) => video.id == id);
 };
-
+//Returns list of basic information for each video
 const videoList = (req, res) => {
   let videos = readfile();
   const videoList = videos.map((video) => {
@@ -20,7 +22,7 @@ const videoList = (req, res) => {
   });
   res.json(videoList);
 };
-
+//Returns details for a single video
 const videoDetail = (req, res) => {
   const currentVideo = getCurrentVideo(req.params.id);
   if (currentVideo) {
@@ -29,7 +31,7 @@ const videoDetail = (req, res) => {
     res.status(400).json("Video not found");
   }
 };
-
+//Put endpoint to increment like count
 const likeVideo = (req, res) => {
   let videos = videoModel.fetchVideoList();
   let currentVideo = videos.find((video) => video.id == req.params.id);
@@ -46,7 +48,7 @@ const likeVideo = (req, res) => {
   videoModel.writeVideoData(videos);
   res.send(currentVideo);
 };
-
+//Returns comment array from selected video
 const videoComments = (req, res) => {
   const currentVideo = getCurrentVideo(req.params.id);
   if (currentVideo) {
@@ -55,7 +57,7 @@ const videoComments = (req, res) => {
     res.status(400).json("Video not found");
   }
 };
-
+//Posts comment to selected video
 const postComment = (req, res) => {
   let videos = readfile();
   const currentVideo = videos.find((video) => video.id == req.params.id);
@@ -75,7 +77,7 @@ const postComment = (req, res) => {
   videoModel.writeVideoData(videos);
   res.status(200).json(newComment);
 };
-
+//Deletes comment from selected video
 const deleteComment = (req, res) => {
   let videos = videoModel.fetchVideoList();
   const currentVideo = videos.find((video) => video.id == req.params.id);
@@ -94,7 +96,7 @@ const deleteComment = (req, res) => {
   videoModel.writeVideoData(videos);
   res.status(200).json(currentComment);
 };
-
+//Likes comment from selected video
 const likeComment = (req, res) => {
   let videos = videoModel.fetchVideoList();
   const currentVideo = videos.find((video) => video.id == req.params.id);
@@ -110,7 +112,7 @@ const likeComment = (req, res) => {
   videoModel.writeVideoData(videos);
   res.status(200).json(currentComment);
 };
-
+//Posts new video to video file
 const postVideo = (req, res) => {
   let filename = "";
   if (req.file) {
